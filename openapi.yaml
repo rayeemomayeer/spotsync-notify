@@ -1,0 +1,56 @@
+openapi: 3.0.3
+info:
+  title: SpotSync Notify
+  version: 0.1.0
+  description: Email and webhook delivery service.
+servers:
+  - url: http://localhost:4100
+paths:
+  /healthz:
+    get:
+      summary: Liveness
+      responses:
+        "200":
+          description: OK
+  /readyz:
+    get:
+      summary: Readiness (Redis)
+      responses:
+        "200":
+          description: Ready
+        "503":
+          description: Not ready
+  /internal/notify:
+    post:
+      summary: Trigger transactional email
+      security:
+        - internalToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, to]
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - reservation_confirmed
+                    - reservation_cancelled
+                    - password_reset
+                    - verify_email
+                    - org_invite
+                to:
+                  type: string
+                  format: email
+                data:
+                  type: object
+      responses:
+        "202":
+          description: Accepted
+components:
+  securitySchemes:
+    internalToken:
+      type: http
+      scheme: bearer
