@@ -1,6 +1,6 @@
 # SpotSync Notify
 
-Consumes Redis pub/sub reservation events and sends email via [Resend](https://resend.com) (free tier). Also delivers HMAC-signed webhook POSTs (retry stub). BFF can trigger emails over an internal HTTP route.
+Consumes Redis pub/sub reservation events and sends email via [Resend](https://resend.com) (free tier). Also delivers HMAC-signed webhook POSTs (retry stub). The Express BFF can trigger emails over `POST /internal/notify` (shared `INTERNAL_TOKEN`).
 
 ## Stack
 
@@ -43,6 +43,13 @@ Optional extras for auth/org emails: `reset_url`, `verify_url`, `invite_url`, `o
 | GET | `/readyz` | — | Ready when Redis subscribed |
 | POST | `/internal/notify` | `Authorization: Bearer <INTERNAL_TOKEN>` or `X-Internal-Token` | BFF-triggered notify |
 
+## Local with siblings
+
+1. Compose Redis (+ API) from SpotSync-server: `deploy/compose`.
+2. `cp .env.example .env` — set `INTERNAL_TOKEN`, `REDIS_URL=redis://localhost:6379`.
+3. `npm install && npm run dev` → `:3100`.
+4. Optional: BFF `NOTIFY_URL=http://localhost:3100` + matching `NOTIFY_INTERNAL_TOKEN`.
+
 ## Setup
 
 ```bash
@@ -72,4 +79,4 @@ See `.env.example`. Without `RESEND_API_KEY`, emails print to stdout (log-only).
 
 ## Deploy (Render free)
 
-`render.yaml` defines a free Node web service. Set secrets in the Render dashboard (`REDIS_URL`, `RESEND_API_KEY`, `INTERNAL_TOKEN`, …).
+`render.yaml` defines a free Node web service. Set secrets in the Render dashboard (`REDIS_URL`, `RESEND_API_KEY`, `INTERNAL_TOKEN`, …). Staging notes live in SpotSync-server `deploy/staging.md`.
