@@ -3,14 +3,12 @@ services:
     name: spotsync-notify
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /healthz
     envVars:
       - key: NODE_VERSION
         value: "20"
-      - key: PORT
-        value: "3100"
       - key: REDIS_URL
         sync: false
       - key: RESEND_API_KEY
