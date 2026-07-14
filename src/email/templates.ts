@@ -3,7 +3,10 @@ export type TemplateName =
   | "reservation_cancelled"
   | "password_reset"
   | "verify_email"
-  | "org_invite";
+  | "org_invite"
+  | "payment_receipt"
+  | "refund_confirmation"
+  | "org_approved";
 
 export interface TemplateVars {
   zone_id?: string;
@@ -14,6 +17,7 @@ export interface TemplateVars {
   verify_url?: string;
   invite_url?: string;
   org_name?: string;
+  amount_cents?: string;
 }
 
 function shell(title: string, body: string): string {
@@ -85,6 +89,40 @@ export function renderTemplate(
           "Organization invite",
           `<p>You were invited to <strong>${vars.org_name ?? "an organization"}</strong>.</p>
           <p><a href="${vars.invite_url ?? "#"}">Accept invite</a></p>`,
+        ),
+      };
+    case "payment_receipt":
+      return {
+        subject: "Payment receipt — SpotSync",
+        html: shell(
+          "Payment receipt",
+          `<p>Thanks for your payment.</p>
+          <ul>
+            <li>Zone: ${vars.zone_id ?? "—"}</li>
+            <li>Reservation: ${vars.reservation_id ?? "—"}</li>
+            <li>Amount: ${vars.amount_cents ? `$${(Number(vars.amount_cents) / 100).toFixed(2)}` : "—"}</li>
+          </ul>`,
+        ),
+      };
+    case "refund_confirmation":
+      return {
+        subject: "Refund processed — SpotSync",
+        html: shell(
+          "Refund confirmation",
+          `<p>Your refund was processed.</p>
+          <ul>
+            <li>Reservation: ${vars.reservation_id ?? "—"}</li>
+            <li>Amount: ${vars.amount_cents ? `$${(Number(vars.amount_cents) / 100).toFixed(2)}` : "—"}</li>
+          </ul>`,
+        ),
+      };
+    case "org_approved":
+      return {
+        subject: `${vars.org_name ?? "Organization"} approved on SpotSync`,
+        html: shell(
+          "Organization approved",
+          `<p><strong>${vars.org_name ?? "Your organization"}</strong> is now active.</p>
+          <p>Sign in to subscribe and create parking zones.</p>`,
         ),
       };
     default: {

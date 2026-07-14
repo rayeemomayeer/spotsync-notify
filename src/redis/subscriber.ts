@@ -97,6 +97,7 @@ export async function processNotifyEvent(
         verify_url: event.verify_url,
         invite_url: event.invite_url,
         org_name: event.org_name,
+        amount_cents: event.amount_cents,
       },
     });
   } else {
